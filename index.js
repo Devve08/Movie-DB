@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = 3005;
+const port = 3006;
 
 app.get('/', (req, res) =>{
     res.send('ok')
@@ -122,10 +122,25 @@ app.get('/movies/update', (req, res) =>{
     res.send(`{status:200, message:"update"}`)
 })
 
+// delete data
 app.get('/movies/delete', (req, res) =>{
     res.send(`{status:200, message:"delet"}`)
 })
 
+
+app.get('/movies/delete/:id', (req, res) =>{
+
+    let operation
+    let result
+    let movieId = req.params.id
+    if ( /\d+/.test(movieId) && movieId !== "" && movieId !== undefined && movieId < movies.length){
+       operation= movies.splice(movieId, 1)
+       result = {status: 200, data : movies}
+    } else {
+        result = {status:404, error:true, message:'the movie <ID> does not exist'}
+    }
+    res.send(result)
+})
 
 app.listen(port, () =>{
     console.log(`hello at http://localhost:${port}`)
