@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = 3002;
+const port = 3003;
 
 app.get('/', (req, res) =>{
     res.send('ok')
@@ -49,15 +49,44 @@ const movies = [
     { title: 'الإرهاب والكباب‎', year: 1992, rating: 6.2 }
 ]
 
-let movreads = {status : 200, data : movies}
 
 app.get('/movies/create', (req, res) =>{
     res.send(`{status:200, message:"create"}`)
 })
 
+// movies read
 app.get('/movies/read', (req, res) =>{
+    let movreads = {status : 200, data : movies}
     res.send(movreads)
 })
+
+app.get('/movies/read/by-date', (req, res) =>{
+
+    let sorted =  movies.sort(function(a, b){
+            return a.year - b.year
+        })
+    
+    res.send({status : 200, data : sorted })
+})
+
+app.get('/movies/read/by-rating', (req, res) =>{
+    let sortRating = movies.sort(function(a, b){
+        return b.rating - a.rating
+    })
+    res.send({status : 200, data : sortRating})
+})
+
+app.get('/movies/read/by-title', (req, res) =>{
+    let sortTitle = movies.sort(function(a, b){
+        let x = a.title.toLowerCase();
+        let y = b.title.toLowerCase();
+        if (x < y) {return -1;}
+        if (x > y) {return 1;}
+        return 0;
+      });
+    res.send({ status : 200, data : sortTitle})
+})
+
 
 app.get('/movies/update', (req, res) =>{
     res.send(`{status:200, message:"update"}`)
