@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = 3003;
+const port = 3004;
 
 app.get('/', (req, res) =>{
     res.send('ok')
@@ -85,6 +85,17 @@ app.get('/movies/read/by-title', (req, res) =>{
         return 0;
       });
     res.send({ status : 200, data : sortTitle})
+})
+
+app.get('/movies/read/id/:id', (req, res) =>{
+
+    if (req.params.id >= 0 && req.params.id < movies.length){
+
+        res.send({status : 200, data : movies[req.params.id]})
+    } else {
+        res.send({status:404, error:true, message:'the movie <ID> does not exist'})
+    }
+    
 })
 
 
