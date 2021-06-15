@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = 3000;
+const port = 3001;
 
 app.get('/', (req, res) =>{
     res.send('ok')
@@ -51,11 +51,11 @@ const movies = [
 
 // movies create
 
-app.put('/movies/create', (req, res) =>{
+app.post('/movies/create', (req, res) =>{
     res.send(`{status:200, message:"create"}`)
 })
 
-app.put('/movies/add', (req, res) =>{
+app.post('/movies/add', (req, res) =>{
 
     let createData 
     if (req.query.title !== "" && req.query.year !== "" &&  /^[0-9]{4}$/.test(req.query.year))
@@ -119,33 +119,41 @@ app.get('/movies/read/id/:id', (req, res) =>{
 
 // update data
 
-app.post('/movies/update', (req, res) =>{
+app.put('/movies/update', (req, res) =>{
     res.send(`{status:200, message:"update"}`)
 })
 
-app.post('/movies/update/:id', (req, res) =>{
+app.put('/movies/update/:id', (req, res) =>{
     let idUpdate = req.params.id
     let newTitle = req.query.title
     let newRating = req.query.rating
+    let newYear = req.query.year
     let titleUpdate
 
-    if(idUpdate < movies.length && idUpdate >= 0 && /\d+/.test(idUpdate) && req.query.rating == undefined){
+    if(idUpdate < movies.length && idUpdate >= 0 && /\d+/.test(idUpdate)){
+        if(newTitle){
+            movies[idUpdate].title = newTitle
+        }
+
+        if(newRating){
+            movies[idUpdate].rating = newRating
+        }
         
-       movies[idUpdate].title = newTitle
-       titleUpdate = movies
-    } else if (idUpdate < movies.length && idUpdate >= 0 && /\d+/.test(idUpdate) && req.query.rating !== undefined) {
+        if(newYear){
+            movies[idUpdate].year = newYear 
+
+        }
+         
+        titleUpdate = movies
        
-       movies[idUpdate].title = newTitle
-       movies[idUpdate].rating = newRating
-       titleUpdate = movies
-    }
     
-    else {
-        
-        titleUpdate = "error"
-    }
+    
+    
 
 
+    } else 
+    titleUpdate= "error"
+    
     res.send(titleUpdate)
 })
 
