@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = 3006;
+const port = 3007;
 
 app.get('/', (req, res) =>{
     res.send('ok')
@@ -117,9 +117,36 @@ app.get('/movies/read/id/:id', (req, res) =>{
     
 })
 
+// update data
 
 app.get('/movies/update', (req, res) =>{
     res.send(`{status:200, message:"update"}`)
+})
+
+app.get('/movies/update/:id', (req, res) =>{
+    let idUpdate = req.params.id
+    let newTitle = req.query.title
+    let newRating = req.query.rating
+    let titleUpdate
+
+    if(idUpdate < movies.length && idUpdate >= 0 && /\d+/.test(idUpdate) && req.query.rating == undefined){
+        
+       movies[idUpdate].title = newTitle
+       titleUpdate = movies
+    } else if (idUpdate < movies.length && idUpdate >= 0 && /\d+/.test(idUpdate) && req.query.rating !== undefined) {
+       
+       movies[idUpdate].title = newTitle
+       movies[idUpdate].rating = newRating
+       titleUpdate = movies
+    }
+    
+    else {
+        
+        titleUpdate = "error"
+    }
+
+
+    res.send(titleUpdate)
 })
 
 // delete data
