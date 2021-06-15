@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = 3007;
+const port = 3000;
 
 app.get('/', (req, res) =>{
     res.send('ok')
@@ -51,11 +51,11 @@ const movies = [
 
 // movies create
 
-app.get('/movies/create', (req, res) =>{
+app.put('/movies/create', (req, res) =>{
     res.send(`{status:200, message:"create"}`)
 })
 
-app.get('/movies/add', (req, res) =>{
+app.put('/movies/add', (req, res) =>{
 
     let createData 
     if (req.query.title !== "" && req.query.year !== "" &&  /^[0-9]{4}$/.test(req.query.year))
@@ -119,11 +119,11 @@ app.get('/movies/read/id/:id', (req, res) =>{
 
 // update data
 
-app.get('/movies/update', (req, res) =>{
+app.post('/movies/update', (req, res) =>{
     res.send(`{status:200, message:"update"}`)
 })
 
-app.get('/movies/update/:id', (req, res) =>{
+app.post('/movies/update/:id', (req, res) =>{
     let idUpdate = req.params.id
     let newTitle = req.query.title
     let newRating = req.query.rating
@@ -150,12 +150,12 @@ app.get('/movies/update/:id', (req, res) =>{
 })
 
 // delete data
-app.get('/movies/delete', (req, res) =>{
-    res.send(`{status:200, message:"delet"}`)
+app.delete('/movies/delete', (req, res) =>{
+    res.send(`{status:200, message:"delete"}`)
 })
 
 
-app.get('/movies/delete/:id', (req, res) =>{
+app.delete('/movies/delete/:id', (req, res) =>{
 
     let operation
     let result
