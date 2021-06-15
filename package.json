@@ -3,12 +3,10 @@
   "version": "1.0.0",
   "description": "Code-movie-database",
   "main": "index.js",
- 
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js"
-},
-
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Devve08/Movie-DB.git"
@@ -20,11 +18,10 @@
   },
   "homepage": "https://github.com/Devve08/Movie-DB#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "mongoose": "^5.12.13"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"
   }
-  
 }
-

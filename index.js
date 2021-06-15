@@ -1,6 +1,31 @@
 const express = require('express');
 const app = express();
-const port = 3001;
+const port = 4008;
+var mongoose = require('mongoose');
+
+const uri = "mongodb+srv://Devve08:abousafa123@movies.cj5gi.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+
+mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true});
+
+var db = mongoose.connection;
+db.on('connected', () => {
+    console.log('connected')
+})
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+
+let movieSchema = new mongoose.Schema({
+    title : {type: String, required: true},
+    year : {type : Number, min:1000, max:3000, required: true},
+    rating : {type : Number, default: 4}
+
+})
+
+let movieDB = mongoose.model('movieD', movieSchema);
+
+
+
+
+
 
 app.get('/', (req, res) =>{
     res.send('ok')
@@ -57,20 +82,19 @@ app.post('/movies/create', (req, res) =>{
 
 app.post('/movies/add', (req, res) =>{
 
-    let createData 
-    if (req.query.title !== "" && req.query.year !== "" &&  /^[0-9]{4}$/.test(req.query.year))
-    {
-        if (req.query.rating !== "" && req.query.rating !== undefined){
-            movies.push({title : req.query.title, year : req.query.year, rating : req.query.rating })
-            createData = {status : 200, data : movies}
-    } else { 
-        movies.push({title : req.query.title, year : req.query.year, rating : 4})
-     createData = {status : 200, data : movies}
-    }
- } else {
-     createData = { status:403, error:true, message:'you cannot create a movie without providing a title and a year' }
- }
- res.send(createData);
+    const movieData = new movieDB({
+        title : req.query.title,
+        year : req.query.year,
+        rating : req.query.rating
+
+    })
+    
+    movieData.save((err, movieData) =>{
+        if (err){
+            res.send(err);
+        } else res.send({ status: 200, data: movieData});
+    } )
+
 })
 
 // movies read
@@ -143,7 +167,7 @@ app.put('/movies/update/:id', (req, res) =>{
             movies[idUpdate].year = newYear 
 
         }
-         
+
         titleUpdate = movies
        
     
