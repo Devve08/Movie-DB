@@ -1,7 +1,8 @@
 const express = require('express');
 const app = express();
 const port = 4008;
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken')
 
 const uri = "mongodb+srv://Devve08:abousafa123@movies.cj5gi.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 
@@ -13,6 +14,59 @@ db.on('connected', () => {
 })
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
+
+app.get('/user', (req, res) => {
+    res.json({
+        message : "welcome to database"
+    })
+})
+
+app.post('/user/posts', verifyToken, (req, res) => {
+    jwt.verify(req.token, 'secretkey', (err, authData) => {
+        if(err){
+            res.sendStatus(403)
+        } else {
+
+            res.json({
+                message : "Post created", 
+                authData
+            })
+
+        }
+    })
+    
+})
+
+app.post('/user/login', (req, res) => {
+    const user= {
+        username : 'Devve',
+        password : '1234'
+    }
+    jwt.sign({user: user}, 'secretkey', (err, token) =>{
+        res.json({
+            token : token
+        })
+    });
+})
+
+function verifyToken(req, res, next){
+    const bearerHeader = req.headers['authorization'];
+
+    if(typeof bearerHeader !== 'undefined'){
+
+        const bearer = bearerHeader.split(' ')
+
+        const bearerToken = bearer[1]
+        
+        req.token = bearerToken
+
+        next()
+
+    } else {
+        res.sendStatus(403);
+    }
+}
+
 let movieSchema = new mongoose.Schema({
     title : {type: String, required: true},
     year : {type : Number, min:1000, max:3000, required: true},
@@ -21,10 +75,6 @@ let movieSchema = new mongoose.Schema({
 })
 
 let movieDB = mongoose.model('movieD', movieSchema);
-
-
-
-
 
 
 app.get('/', (req, res) =>{
@@ -80,18 +130,19 @@ app.post('/movies/create', (req, res) =>{
     res.send(`{status:200, message:"create"}`)
 })
 
-app.post('/movies/add', (req, res) =>{
+app.post('/movies/:add', (req, res) =>{
+    
 
-    const movieData = new movieDB({
+    const movieData = new movieDB([{
         title : req.query.title,
         year : req.query.year,
         rating : req.query.rating
 
-    })
-    
+    }])
+    console.log(req.query.year)
     movieData.save((err, movieData) =>{
         if (err){
-            res.send(err);
+            res.send("error");
         } else res.send({ status: 200, data: movieData});
     } )
 
@@ -99,8 +150,12 @@ app.post('/movies/add', (req, res) =>{
 
 // movies read
 app.get('/movies/read', (req, res) =>{
-    let movreads = {status : 200, data : movies}
-    res.send(movreads)
+    try {
+        let read = movieSchema
+        res.send(read)
+    } catch(err){
+        res.send("error" + err)
+    }
 })
 
 app.get('/movies/read/by-date', (req, res) =>{
@@ -147,14 +202,19 @@ app.put('/movies/update', (req, res) =>{
     res.send(`{status:200, message:"update"}`)
 })
 
-app.put('/movies/update/:id', (req, res) =>{
+app.put('/movies/update/:id', verifyToken, (req, res) =>{
     let idUpdate = req.params.id
     let newTitle = req.query.title
     let newRating = req.query.rating
     let newYear = req.query.year
     let titleUpdate
 
-    if(idUpdate < movies.length && idUpdate >= 0 && /\d+/.test(idUpdate)){
+    jwt.verify(req.token, "secretkey", (err, authData) => {
+
+        if(err) {
+            res.sendStatus(403);
+        } else{
+            if(idUpdate < movies.length && idUpdate >= 0 && /\d+/.test(idUpdate)){
         if(newTitle){
             movies[idUpdate].title = newTitle
         }
@@ -168,19 +228,25 @@ app.put('/movies/update/:id', (req, res) =>{
 
         }
 
-        titleUpdate = movies
+        res.send({
+            status: 200,
+            data: movies,
+            authData: authData
+        })
        
-    
-    
     
 
 
     } else 
     titleUpdate= "error"
     
-    res.send(titleUpdate)
+    res.send({
+        status:404,
+        error: true,
+        message: "The movie id does not exist"})}
 })
-
+    
+})
 // delete data
 app.delete('/movies/delete', (req, res) =>{
     res.send(`{status:200, message:"delete"}`)
